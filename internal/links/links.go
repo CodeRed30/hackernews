@@ -3,8 +3,8 @@ package links
 import (
 	"log"
 
-	database "github.com/glyphack/go-graphql-hackernews/internal/pkg/db/mysql"
-	"github.com/glyphack/go-graphql-hackernews/internal/users"
+	database "github.com/codered30/hackernews/internal/pkg/db/migrations/mysql"
+	"github.com/codered30/hackernews/internal/users"
 )
 
 // #1
@@ -34,4 +34,30 @@ func (link Link) Save() int64 {
 	}
 	log.Print("Row inserted!")
 	return id
+}
+
+func GetAll() []Link {
+	stmt, err := database.Db.Prepare("select id, title, address from Links")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close()
+	rows, err := stmt.Query()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	var links []Link
+	for rows.Next() {
+		var link Link
+		err := rows.Scan(&link.ID, &link.Title, &link.Address)
+		if err != nil {
+			log.Fatal(err)
+		}
+		links = append(links, link)
+	}
+	if err = rows.Err(); err != nil {
+		log.Fatal(err)
+	}
+	return links
 }

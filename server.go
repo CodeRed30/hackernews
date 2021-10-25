@@ -5,6 +5,10 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/codered30/hackernews/graph"
+	"github.com/codered30/hackernews/graph/generated"
+	database "github.com/codered30/hackernews/internal/pkg/db/migrations/mysql"
+
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-chi/chi"
@@ -22,7 +26,7 @@ func main() {
 
 	database.InitDB()
 	database.Migrate()
-	server := handler.NewDefaultServer(hackernews.NewExecutableSchema(hackernews.Config{Resolvers: &hackernews.Resolver{}}))
+	server := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
 	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	router.Handle("/query", server)
 
